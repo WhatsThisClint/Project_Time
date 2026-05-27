@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "project-time"
+version = "0.2.0"
+description = "Automated time-series data cleaning, forecasting, and TimesFM-powered analysis with a web UI."
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [
+  { name = "WhatsThisClint" }
+]
+dependencies = [
+  "numpy>=1.26",
+  "openpyxl>=3.1",
+  "pandas>=2.2",
+]
+
+[project.optional-dependencies]
+classical = [
+  "statsmodels>=0.14",
+]
+timesfm = [
+  "timesfm[torch]>=1.3.0",
+]
+web = [
+  "fastapi>=0.115",
+  "python-multipart>=0.0.9",
+  "uvicorn[standard]>=0.30",
+]
+all = [
+  "fastapi>=0.115",
+  "python-multipart>=0.0.9",
+  "statsmodels>=0.14",
+  "timesfm[torch]>=1.3.0",
+  "uvicorn[standard]>=0.30",
+]
+
+[project.scripts]
+project-time = "project_time.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"project_time.web" = ["static/*"]

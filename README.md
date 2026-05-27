@@ -1,30 +1,94 @@
-The provided Python script is a user-interactive program that processes CSV files for time series analysis.
+# Project Time
 
-This script provides a comprehensive and interactive way to process CSV files. It allows the user to merge multiple files, delete and rename columns, filter data based on location, modify column values, and save the processed data to new files.
+Project Time is a small time-series workbench for messy CSV and Excel files. It automates the pre-processing steps from the original notebook, adds reproducible command-line workflows, supports multiple forecasting methods, and includes a browser UI.
 
-Here's what you need to do.
+The original `Pre_processing.ipynb` is kept as historical provenance. New reusable code lives in `src/project_time/`.
 
-Install Visual Studio Code (VSCode)
+## What It Does
 
-Download and install Visual Studio Code from the official website
-Install Python from the official Website
+- Reads CSV and Excel files.
+- Infers likely date, value, and series ID columns.
+- Cleans invalid dates, non-numeric target values, duplicate timestamps, missing periods, missing values, and optional outliers.
+- Supports single-series and multi-series forecasting.
+- Includes baseline methods: naive, seasonal naive, drift, moving average, and ensemble.
+- Adds optional classical methods: ETS and ARIMA through `statsmodels`.
+- Adds optional TimesFM forecasting with first-use model download and local cache.
+- Provides a FastAPI web UI for upload, cleaning, forecasting, metrics, and charts.
 
-You can choose the appropriate installer for your operating system and follow the installation instructions.
+## Install
 
-Open Visual Studio Code.
+Core cleaning and baseline forecasting:
 
-Open a folder of your choice and Create and Activate an Environment in VSCode by pressing Ctrl + Shift + P to open the Command Palette. (Place the code in this folder too)
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -e .
+```
 
-Type "Python: Create Environment" and select Venv.
+Web UI:
 
-After the environment is created, press Ctrl + Shift + P again.
+```powershell
+python -m pip install -e .[web]
+project-time web
+```
 
-Type "Python: Select Interpreter" and select the Venv option (this happens by default)
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
-Install JupyterLab in the Conda Environment by opening a terminal in Visual Studio Code and running the following command:
+TimesFM support:
 
-pip install jupyterlab
+```powershell
+python -m pip install -e .[timesfm]
+project-time download-timesfm
+```
 
-once done type jupyter lab and you will be redirected to your browser where you can run the script.
+TimesFM downloads `google/timesfm-2.5-200m-pytorch` from Hugging Face on first use. The model is stored in the normal Hugging Face cache unless you pass `--cache-dir`.
 
-Following these steps gives you a fully functional environment to run the provided script. The script will automatically install the libraries and guide you through the data processing steps, allowing you to merge, delete, and rename columns, filter data based on location, modify column values, and save the processed data to new files.
+Everything:
+
+```powershell
+python -m pip install -e .[all]
+```
+
+## CLI Examples
+
+Clean a file with automatic column inference:
+
+```powershell
+project-time clean examples\sample_groundwater.csv --output outputs\clean
+```
+
+Forecast 12 future steps with the default ensemble:
+
+```powershell
+project-time forecast examples\sample_groundwater.csv --horizon 12 --holdout 4 --output outputs\forecast
+```
+
+Forecast with explicit columns:
+
+```powershell
+project-time forecast data.csv --date-column date --value-column level --id-column site --frequency MS --method ensemble
+```
+
+Forecast with TimesFM:
+
+```powershell
+project-time forecast data.csv --date-column date --value-column level --id-column site --method timesfm --horizon 24
+```
+
+## Tests
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m unittest discover -s tests
+```
+
+## Repository Layout
+
+- `Pre_processing.ipynb`: original interactive notebook.
+- `src/project_time/cleaning.py`: automated cleaning and validation.
+- `src/project_time/forecasting.py`: baseline, classical, ensemble, and TimesFM forecast routing.
+- `src/project_time/timesfm_integration.py`: lazy TimesFM model loading and cache/download helper.
+- `src/project_time/web/`: FastAPI app and browser UI.
+- `tests/`: lightweight regression tests.
+- `examples/`: small sample data for smoke tests.

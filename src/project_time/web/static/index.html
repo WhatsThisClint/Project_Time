@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Project Time</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Project Time</p>
+            <h1>Clean and forecast time-series data</h1>
+          </div>
+          <button id="downloadModel" class="icon-button" type="button" title="Cache TimesFM model">
+            <span aria-hidden="true">TFM</span>
+          </button>
+        </header>
+
+        <div class="layout">
+          <form id="runForm" class="control-panel">
+            <label class="file-drop">
+              <input id="fileInput" name="file" type="file" accept=".csv,.xlsx,.xls" required />
+              <span class="file-title">Choose CSV or Excel</span>
+              <span id="fileName" class="file-name">No file selected</span>
+            </label>
+
+            <div class="field-grid">
+              <label>
+                <span>Date</span>
+                <select id="dateColumn" name="date_column" required></select>
+              </label>
+              <label>
+                <span>Value</span>
+                <select id="valueColumn" name="value_column" required></select>
+              </label>
+              <label>
+                <span>Series</span>
+                <select id="idColumn" name="id_column"></select>
+              </label>
+              <label>
+                <span>Frequency</span>
+                <input id="frequency" name="frequency" placeholder="Auto" />
+              </label>
+            </div>
+
+            <div class="field-grid compact">
+              <label>
+                <span>Missing</span>
+                <select name="missing">
+                  <option value="interpolate">Interpolate</option>
+                  <option value="ffill">Forward fill</option>
+                  <option value="bfill">Backward fill</option>
+                  <option value="drop">Drop</option>
+                  <option value="none">Leave</option>
+                </select>
+              </label>
+              <label>
+                <span>Duplicates</span>
+                <select name="duplicates">
+                  <option value="mean">Mean</option>
+                  <option value="sum">Sum</option>
+                  <option value="first">First</option>
+                  <option value="last">Last</option>
+                </select>
+              </label>
+              <label>
+                <span>Outliers</span>
+                <select name="outliers">
+                  <option value="none">None</option>
+                  <option value="iqr">IQR cap</option>
+                  <option value="zscore">Z-score cap</option>
+                  <option value="winsorize">Winsorize</option>
+                </select>
+              </label>
+              <label>
+                <span>Method</span>
+                <select name="method">
+                  <option value="ensemble">Ensemble</option>
+                  <option value="timesfm">TimesFM</option>
+                  <option value="seasonal_naive">Seasonal naive</option>
+                  <option value="drift">Drift</option>
+                  <option value="moving_average">Moving average</option>
+                  <option value="ets">ETS</option>
+                  <option value="arima">ARIMA</option>
+                  <option value="naive">Naive</option>
+                </select>
+              </label>
+              <label>
+                <span>Horizon</span>
+                <input name="horizon" type="number" min="1" max="256" value="12" />
+              </label>
+              <label>
+                <span>Holdout</span>
+                <input name="holdout" type="number" min="0" value="0" />
+              </label>
+            </div>
+
+            <button class="primary-button" type="submit">Run pipeline</button>
+          </form>
+
+          <section class="result-panel">
+            <div class="status-row">
+              <span id="status">Waiting for a file</span>
+            </div>
+            <div class="metrics" id="metrics"></div>
+            <div class="chart-wrap">
+              <svg id="chart" viewBox="0 0 900 360" role="img" aria-label="Forecast chart"></svg>
+            </div>
+            <div class="tables">
+              <div>
+                <h2>Preview</h2>
+                <div id="preview" class="table-scroll"></div>
+              </div>
+              <div>
+                <h2>Forecast</h2>
+                <div id="forecastTable" class="table-scroll"></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
